@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Brain and the Bot Podcast</title>
+  <meta name="description" content="Two clinician educators learning and discussing Artificial Intelligence related topics from a Medical Education perspective.">
+  <link rel="canonical" href="https://brainandthebot.ai/">
+  <link rel="icon" href="cover.jpg">
+  <link rel="alternate" type="application/rss+xml" title="The Brain and the Bot Podcast" href="https://feeds.libsyn.com/625985/rss">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="The Brain and the Bot Podcast">
+  <meta property="og:description" content="Two clinician educators learning and discussing Artificial Intelligence related topics from a Medical Education perspective.">
+  <meta property="og:url" content="https://brainandthebot.ai/">
+  <meta property="og:image" content="https://brainandthebot.ai/cover.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+  <a href="https://sites.libsyn.com/625985">
+    <img class="hero-art" src="cover.jpg" alt="The Brain and the Bot Podcast cover art" width="320" height="320">
+  </a>
+  <div class="hero-text">
+    <h1 class="title">
+      <span class="title-brain">The Brain</span>
+      <span class="title-bot">and the Bot</span>
+    </h1>
+    <p class="tagline">Two clinician educators learning and discussing Artificial Intelligence related topics from a Medical Education perspective.</p>
+
+    <nav class="listen" aria-label="Listen on">
+      <a class="listen-link" href="https://podcasts.apple.com/us/podcast/the-brain-and-the-bot-podcast/id6819870097">Apple Podcasts</a>
+      <a class="listen-link" href="https://open.spotify.com/show/033UAKOpBfhiVzTzHCHRVw">Spotify</a>
+      <a class="listen-link" href="https://www.youtube.com/@theBrainandtheBot">YouTube</a>
+      <a class="listen-link listen-rss" href="https://feeds.libsyn.com/625985/rss">RSS</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="episodes" aria-labelledby="episodes-heading">
+    <h2 id="episodes-heading">Episodes</h2>
+    <ol id="episode-list" class="episode-list">
+      <!-- Shown until the RSS feed loads; the script replaces it with the live list. -->
+      <li class="episode">
+        <a class="episode-title" href="https://7adeb92c-09b8-459e-809d-650e9bc17e53.libsyn.com/learning-mind-of-the-beholder">Learning, Mind of the Beholder</a>
+        <span class="episode-meta"><time datetime="2026-10-06">6 October 2026</time> · 33 min</span>
+      </li>
+      <li class="episode">
+        <a class="episode-title" href="https://7adeb92c-09b8-459e-809d-650e9bc17e53.libsyn.com/what-is-clinical-practice">What is Clinical Practice?</a>
+        <span class="episode-meta"><time datetime="2026-10-06">6 October 2026</time> · 36 min</span>
+      </li>
+      <li class="episode">
+        <a class="episode-title" href="https://7adeb92c-09b8-459e-809d-650e9bc17e53.libsyn.com/beyond-medical-expertise-ai-imposters">Beyond Medical Expertise, AI Imposters</a>
+        <span class="episode-meta"><time datetime="2026-10-06">6 October 2026</time> · 34 min</span>
+      </li>
+      <li class="episode">
+        <a class="episode-title" href="https://7adeb92c-09b8-459e-809d-650e9bc17e53.libsyn.com/deskilling">Deskilling</a>
+        <span class="episode-meta"><time datetime="2026-07-23">23 July 2026</time> · 35 min</span>
+      </li>
+    </ol>
+    <p id="episode-status" class="episode-status" hidden></p>
+    <p class="episode-more"><a href="https://sites.libsyn.com/625985">All episodes</a></p>
+  </section>
+
+  <section class="about" aria-labelledby="about-heading">
+    <h2 id="about-heading">Hosts</h2>
+    <p><strong>Daniel Brandt Vegas</strong>, MD, MHPE, MERIT Scholar</p>
+    <p><strong>Steven Wong</strong>, MD, MHI, ACMIO</p>
+  </section>
+
+  <section class="contact" aria-labelledby="contact-heading">
+    <h2 id="contact-heading">Get in touch</h2>
+    <p>Questions, episode ideas, or corrections: <a href="mailto:hello@brainandthebot.ai">hello@brainandthebot.ai</a>.</p>
+  </section>
+</main>
+
+<footer>
+  <p>© <span id="year">2026</span> The Brain and the Bot Podcast. Opinions are the hosts' own and are not medical advice.</p>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Rebuild the episode list from the Libsyn feed on every load, so the site
+  // updates itself whenever an episode is published. Libsyn doesn't send CORS
+  // headers, so the feed is read through a public proxy.
+  const FEED = 'https://feeds.libsyn.com/625985/rss';
+  const MAX_EPISODES = 10;
+
+  const list = document.getElementById('episode-list');
+  const status = document.getElementById('episode-status');
+
+  function formatDate(s) {
+    const d = new Date(s);
+    return isNaN(d) ? '' : d.toLocaleDateString('en-CA', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function formatDuration(s) {
+    if (!s) return '';
+    const p = s.split(':').map(Number);
+    const secs = p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2]
+               : p.length === 2 ? p[0] * 60 + p[1]
+               : p[0];
+    return Math.round(secs / 60) + ' min';
+  }
+
+  async function loadEpisodes() {
+    try {
+      const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(FEED));
+      if (!res.ok) throw new Error(res.status);
+      const xml = new DOMParser().parseFromString(await res.text(), 'text/xml');
+      const items = [...xml.querySelectorAll('item')].slice(0, MAX_EPISODES);
+      if (!items.length) throw new Error('empty feed');
+
+      list.innerHTML = '';
+      for (const item of items) {
+        const title = item.querySelector('title')?.textContent ?? 'Untitled';
+        const link = item.querySelector('link')?.textContent ?? 'https://sites.libsyn.com/625985';
+        const date = item.querySelector('pubDate')?.textContent ?? '';
+        const dur = item.getElementsByTagName('itunes:duration')[0]?.textContent ?? '';
+
+        const li = document.createElement('li');
+        li.className = 'episode';
+        const a = document.createElement('a');
+        a.className = 'episode-title';
+        a.href = link;
+        a.textContent = title;
+        const meta = document.createElement('span');
+        meta.className = 'episode-meta';
+        const t = document.createElement('time');
+        t.textContent = formatDate(date);
+        if (date) t.dateTime = new Date(date).toISOString().slice(0, 10);
+        meta.append(t, dur ? ' · ' + formatDuration(dur) : '');
+        li.append(a, meta);
+        list.appendChild(li);
+      }
+    } catch (err) {
+      // Static list stays in place; just note that it may be behind.
+      status.textContent = 'Showing a cached list. The latest episodes are on your podcast app.';
+      status.hidden = false;
+    }
+  }
+  loadEpisodes();
+</script>
+</body>
+</html>
