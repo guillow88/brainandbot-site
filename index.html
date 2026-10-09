@@ -153,6 +153,61 @@
     return cut.slice(0, Math.max(cut.lastIndexOf('. '), cut.lastIndexOf(' '))) + '\u2026';
   }
 
+  // ---- Listening analytics: posts small JSON events to /track (functions/track.js) ----
+  function sendEvent(audio, event, extra = {}) {
+    const payload = JSON.stringify({
+      event,
+      episode: audio.dataset.episode || audio.src,
+      title: audio.dataset.title || '',
+      position: Math.round(audio.currentTime || 0),
+      duration: Math.round(audio.duration || 0),
+      percent: audio.duration ? Math.round(100 * audio.currentTime / audio.duration) : 0,
+      ...extra,
+    });
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/track', new Blob([payload], { type: 'application/json' }));
+    } else {
+      fetch('/track', { method: 'POST', body: payload, headers: { 'Content-Type': 'application/json' }, keepalive: true }).catch(() => {});
+    }
+  }
+
+  function attachTracking(audio) {
+    let started = false;
+    const hit = new Set();
+
+    audio.addEventListener('play', () => {
+      // one episode at a time
+      document.querySelectorAll('audio.episode-player').forEach(o => { if (o !== audio) o.pause(); });
+      if (!started) { started = true; sendEvent(audio, 'play'); }
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (!audio.duration) return;
+      const pct = audio.currentTime / audio.duration;
+      for (const m of [25, 50, 75]) {
+        if (pct >= m / 100 && !hit.has(m)) { hit.add(m); sendEvent(audio, 'milestone', { percent: m }); }
+      }
+    });
+
+    audio.addEventListener('ended', () => {
+      if (!hit.has(100)) { hit.add(100); sendEvent(audio, 'complete', { percent: 100 }); }
+    });
+
+    // Last known position when the listener leaves mid-episode.
+    window.addEventListener('pagehide', () => {
+      if (started && !audio.ended && audio.currentTime > 5) sendEvent(audio, 'leave');
+    });
+  }
+
+  // Static fallback players (present before the feed loads)
+  document.querySelectorAll('audio.episode-player').forEach(a => {
+    const li = a.closest('.episode');
+    const link = li?.querySelector('.episode-title');
+    a.dataset.episode = (link?.getAttribute('href') || '').split('/').pop() || a.src;
+    a.dataset.title = link?.textContent || '';
+    attachTracking(a);
+  });
+
   async function loadFeed() {
     try {
       const res = await fetch(FEED);
@@ -198,11 +253,10 @@
           audio.controls = true;
           audio.preload = 'none';
           audio.src = audioUrl;
-          // Pause any other episode when this one starts.
-          audio.addEventListener('play', () => {
-            document.querySelectorAll('audio.episode-player').forEach(o => { if (o !== audio) o.pause(); });
-          });
+          audio.dataset.episode = link.split('/').pop() || title;
+          audio.dataset.title = title;
           li.append(audio);
+          attachTracking(audio);
         }
 
         if (desc) {
