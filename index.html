@@ -32,7 +32,7 @@
       <span class="title-brain">The Brain</span>
       <span class="title-bot">and the Bot</span>
     </h1>
-    <p class="tagline">Two clinician educators learning and discussing Artificial Intelligence related topics from a Medical Education perspective.</p>
+    <p class="tagline" id="tagline">Two clinician educators learning and discussing Artificial Intelligence related topics from a Medical Education perspective.</p>
 
     <nav class="listen" aria-label="Listen on">
       <a class="listen-link" href="https://podcasts.apple.com/us/podcast/the-brain-and-the-bot-podcast/id6819870097">Apple Podcasts</a>
@@ -71,8 +71,8 @@
 
   <section class="about" aria-labelledby="about-heading">
     <h2 id="about-heading">Hosts</h2>
-    <p><strong>Daniel Brandt Vegas</strong>, MD, MHPE</p>
-    <p><strong>Steven Wong</strong>, MD, MHI </p>
+    <p><strong>Daniel Brandt Vegas</strong>, MD, MHPE, MERIT Scholar</p>
+    <p><strong>Steven Wong</strong>, MD, MHI, ACMIO</p>
   </section>
 
   <section class="contact" aria-labelledby="contact-heading">
@@ -88,14 +88,16 @@
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // Rebuild the episode list from the Libsyn feed on every load, so the site
-  // updates itself whenever an episode is published. Libsyn doesn't send CORS
+  // Rebuild the tagline and episode list from the Libsyn feed on every load,
+  // so the site follows whatever is edited in Libsyn. Libsyn doesn't send CORS
   // headers, so the feed is read through a public proxy.
   const FEED = 'https://feeds.libsyn.com/625985/rss';
   const MAX_EPISODES = 10;
+  const TEASER_CHARS = 240;
 
   const list = document.getElementById('episode-list');
   const status = document.getElementById('episode-status');
+  const tagline = document.getElementById('tagline');
 
   function formatDate(s) {
     const d = new Date(s);
@@ -111,11 +113,36 @@
     return Math.round(secs / 60) + ' min';
   }
 
-  async function loadEpisodes() {
+  // HTML -> plain text, dropping "(MM:SS) Title" chapter lines and extra whitespace.
+  function cleanDescription(html) {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = html.replace(/<\/(p|div|li|br)>/gi, '\n').replace(/<br\s*\/?>/gi, '\n');
+    return div.textContent
+      .split('\n')
+      .map(l => l.trim())
+      .filter(l => l && !/^\(?\d{1,2}:\d{2}(:\d{2})?\)?\s/.test(l))
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function teaser(text) {
+    if (text.length <= TEASER_CHARS) return text;
+    const cut = text.slice(0, TEASER_CHARS);
+    return cut.slice(0, Math.max(cut.lastIndexOf('. '), cut.lastIndexOf(' '))) + '\u2026';
+  }
+
+  async function loadFeed() {
     try {
       const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(FEED));
       if (!res.ok) throw new Error(res.status);
       const xml = new DOMParser().parseFromString(await res.text(), 'text/xml');
+
+      // Show-level description -> hero tagline
+      const showDesc = cleanDescription(xml.querySelector('channel > description')?.textContent);
+      if (showDesc) tagline.textContent = showDesc;
+
       const items = [...xml.querySelectorAll('item')].slice(0, MAX_EPISODES);
       if (!items.length) throw new Error('empty feed');
 
@@ -125,29 +152,54 @@
         const link = item.querySelector('link')?.textContent ?? 'https://sites.libsyn.com/625985';
         const date = item.querySelector('pubDate')?.textContent ?? '';
         const dur = item.getElementsByTagName('itunes:duration')[0]?.textContent ?? '';
+        const desc = cleanDescription(item.querySelector('description')?.textContent);
 
         const li = document.createElement('li');
         li.className = 'episode';
+
         const a = document.createElement('a');
         a.className = 'episode-title';
         a.href = link;
         a.textContent = title;
+
         const meta = document.createElement('span');
         meta.className = 'episode-meta';
         const t = document.createElement('time');
         t.textContent = formatDate(date);
         if (date) t.dateTime = new Date(date).toISOString().slice(0, 10);
-        meta.append(t, dur ? ' · ' + formatDuration(dur) : '');
+        meta.append(t, dur ? ' \u00b7 ' + formatDuration(dur) : '');
+
         li.append(a, meta);
+
+        if (desc) {
+          const p = document.createElement('p');
+          p.className = 'episode-desc';
+          const short = teaser(desc);
+          p.textContent = short;
+          if (short !== desc) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'episode-more-btn';
+            btn.textContent = 'More';
+            btn.addEventListener('click', () => {
+              const open = p.dataset.open === '1';
+              p.firstChild.textContent = open ? short : desc;
+              btn.textContent = open ? 'More' : 'Less';
+              p.dataset.open = open ? '0' : '1';
+            });
+            p.append(' ', btn);
+          }
+          li.append(p);
+        }
+
         list.appendChild(li);
       }
     } catch (err) {
-      // Static list stays in place; just note that it may be behind.
       status.textContent = 'Showing a cached list. The latest episodes are on your podcast app.';
       status.hidden = false;
     }
   }
-  loadEpisodes();
+  loadFeed();
 </script>
 </body>
 </html>

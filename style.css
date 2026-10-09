@@ -218,3 +218,27 @@ footer p { margin: 0; max-width: var(--measure); }
   html { scroll-behavior: auto; }
   .listen-link { transition: none; }
 }
+
+.episode-more {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.episode-desc {
+  margin: 0.35rem 0 0;
+  font-size: 0.97rem;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: var(--measure);
+}
+
+.episode-more-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--link);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
