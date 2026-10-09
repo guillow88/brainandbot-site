@@ -242,3 +242,54 @@ footer p { margin: 0; max-width: var(--measure); }
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
+
+/* Hosts */
+
+.host-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (min-width: 560px) {
+  .host-list { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+}
+
+.host {
+  display: flex;
+  gap: 1.1rem;
+  align-items: flex-start;
+}
+
+.host-photo {
+  flex: 0 0 auto;
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--rule);
+}
+
+.host-text p { margin: 0; }
+
+.host-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.host-creds {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 0.4rem !important;
+}
+
+.host-bio {
+  font-size: 0.97rem;
+  line-height: 1.5;
+}
+
+/* Alternate the ring colour so the two voices read distinctly */
+.host:first-child .host-photo { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--brain); }
+.host:last-child  .host-photo { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--bot); }
