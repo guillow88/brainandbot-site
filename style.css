@@ -293,3 +293,11 @@ footer p { margin: 0; max-width: var(--measure); }
 /* Alternate the ring colour so the two voices read distinctly */
 .host:first-child .host-photo { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--brain); }
 .host:last-child  .host-photo { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--bot); }
+
+.episode-player {
+  display: block;
+  width: 100%;
+  max-width: 36rem;
+  margin: 0.6rem 0 0.2rem;
+  height: 40px;
+}

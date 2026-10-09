@@ -51,18 +51,22 @@
       <li class="episode">
         <a class="episode-title" href="https://7adeb92c-09b8-459e-809d-650e9bc17e53.libsyn.com/learning-mind-of-the-beholder">Learning, Mind of the Beholder</a>
         <span class="episode-meta"><time datetime="2026-10-06">6 October 2026</time> · 33 min</span>
+        <audio class="episode-player" controls preload="none" src="https://traffic.libsyn.com/secure/7adeb92c-09b8-459e-809d-650e9bc17e53/untitled2026-10-06_16_51_30_Learning_Mind_of_the_Beholder.mp3?dest-id=5512620"></audio>
       </li>
       <li class="episode">
         <a class="episode-title" href="https://7adeb92c-09b8-459e-809d-650e9bc17e53.libsyn.com/what-is-clinical-practice">What is Clinical Practice?</a>
         <span class="episode-meta"><time datetime="2026-10-06">6 October 2026</time> · 36 min</span>
+        <audio class="episode-player" controls preload="none" src="https://traffic.libsyn.com/secure/7adeb92c-09b8-459e-809d-650e9bc17e53/2026-09-30_16_58_56.mp3?dest-id=5512620"></audio>
       </li>
       <li class="episode">
         <a class="episode-title" href="https://7adeb92c-09b8-459e-809d-650e9bc17e53.libsyn.com/beyond-medical-expertise-ai-imposters">Beyond Medical Expertise, AI Imposters</a>
         <span class="episode-meta"><time datetime="2026-10-06">6 October 2026</time> · 34 min</span>
+        <audio class="episode-player" controls preload="none" src="https://traffic.libsyn.com/secure/7adeb92c-09b8-459e-809d-650e9bc17e53/untitled2026-09-30_15_33_57.mp3?dest-id=5512620"></audio>
       </li>
       <li class="episode">
         <a class="episode-title" href="https://7adeb92c-09b8-459e-809d-650e9bc17e53.libsyn.com/deskilling">Deskilling</a>
         <span class="episode-meta"><time datetime="2026-07-23">23 July 2026</time> · 35 min</span>
+        <audio class="episode-player" controls preload="none" src="https://traffic.libsyn.com/secure/7adeb92c-09b8-459e-809d-650e9bc17e53/podcast_3a-podcut.mp3?dest-id=5512620"></audio>
       </li>
     </ol>
     <p id="episode-status" class="episode-status" hidden></p>
@@ -169,6 +173,7 @@
         const date = item.querySelector('pubDate')?.textContent ?? '';
         const dur = item.getElementsByTagName('itunes:duration')[0]?.textContent ?? '';
         const desc = cleanDescription(item.querySelector('description')?.textContent);
+        const audioUrl = item.querySelector('enclosure')?.getAttribute('url') ?? '';
 
         const li = document.createElement('li');
         li.className = 'episode';
@@ -186,6 +191,19 @@
         meta.append(t, dur ? ' \u00b7 ' + formatDuration(dur) : '');
 
         li.append(a, meta);
+
+        if (audioUrl) {
+          const audio = document.createElement('audio');
+          audio.className = 'episode-player';
+          audio.controls = true;
+          audio.preload = 'none';
+          audio.src = audioUrl;
+          // Pause any other episode when this one starts.
+          audio.addEventListener('play', () => {
+            document.querySelectorAll('audio.episode-player').forEach(o => { if (o !== audio) o.pause(); });
+          });
+          li.append(audio);
+        }
 
         if (desc) {
           const p = document.createElement('p');
