@@ -77,7 +77,7 @@
         <div class="host-text">
           <p class="host-name">Daniel Brandt Vegas</p>
           <p class="host-creds">MD, MHPE, MERIT Scholar</p>
-          <p class="host-bio">Internist and medical educator.</p>
+          <p class="host-bio">Internist and medical educator at McMaster University.</p>
         </div>
       </li>
       <li class="host">
@@ -85,7 +85,7 @@
         <div class="host-text">
           <p class="host-name">Steven Wong</p>
           <p class="host-creds">MD, MHI</p>
-          <p class="host-bio">Internist and health-informatics specialist working on AI in healthcare.</p>
+          <p class="host-bio">Clinician and health-informatics lead working on AI in hospital care.</p>
         </div>
       </li>
     </ul>
@@ -105,9 +105,9 @@
   document.getElementById('year').textContent = new Date().getFullYear();
 
   // Rebuild the tagline and episode list from the Libsyn feed on every load,
-  // so the site follows whatever is edited in Libsyn. Libsyn doesn't send CORS
-  // headers, so the feed is read through a public proxy.
-  const FEED = 'https://feeds.libsyn.com/625985/rss';
+  // so the site follows whatever is edited in Libsyn. The feed is served from
+  // this domain by functions/feed.js (a Cloudflare Pages Function).
+  const FEED = '/feed';
   const MAX_EPISODES = 10;
   const TEASER_CHARS = 240;
 
@@ -151,7 +151,7 @@
 
   async function loadFeed() {
     try {
-      const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(FEED));
+      const res = await fetch(FEED);
       if (!res.ok) throw new Error(res.status);
       const xml = new DOMParser().parseFromString(await res.text(), 'text/xml');
 
